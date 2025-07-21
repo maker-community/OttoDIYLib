@@ -23,16 +23,32 @@ import time
 import sys
 
 # 配置串口参数
-COM_PORT = 'COM3'  # 根据实际情况修改
+COM_PORT = 'COM10'  # 根据实际情况修改
 BAUDRATE = 115200
 TIMEOUT = 2
 
 class OttoSerialController:
     def __init__(self, port, baudrate=115200, timeout=2):
         try:
-            self.serial = serial.Serial(port, baudrate, timeout=timeout)
-            time.sleep(2)  # 等待Arduino重启
+            self.serial = serial.Serial(
+                port=port, 
+                baudrate=baudrate, 
+                timeout=timeout,
+                write_timeout=timeout,
+                bytesize=serial.EIGHTBITS,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                xonxoff=False,
+                rtscts=False,
+                dsrdtr=False
+            )
+            time.sleep(3)  # 增加等待时间让Arduino完全重启
             print(f"连接到Otto机器人: {port}")
+            
+            # 清空缓冲区
+            self.serial.flushInput()
+            self.serial.flushOutput()
+            
         except Exception as e:
             print(f"无法连接到串口 {port}: {e}")
             sys.exit(1)
@@ -40,15 +56,43 @@ class OttoSerialController:
     def send_command(self, command):
         """发送命令并获取响应"""
         try:
-            # 发送命令
-            cmd_bytes = (command + '\n').encode('utf-8')
+            # 清空输入缓冲区
+            self.serial.flushInput()
+            
+            # 发送命令 - 使用\r\n作为行结束符
+            cmd_bytes = (command + '\r\n').encode('utf-8')
             self.serial.write(cmd_bytes)
+            self.serial.flush()  # 强制发送
             print(f"发送: {command}")
             
-            # 读取响应
-            response = self.serial.readline().decode('utf-8').strip()
-            print(f"响应: {response}")
+            # 等待一点时间让Arduino处理
+            time.sleep(0.1)
+            
+            # 读取响应 - 增加超时重试机制
+            response = ""
+            retry_count = 0
+            max_retries = 3
+            
+            while retry_count < max_retries:
+                try:
+                    if self.serial.in_waiting > 0:
+                        response = self.serial.readline().decode('utf-8').strip()
+                        if response:
+                            break
+                    time.sleep(0.1)
+                    retry_count += 1
+                except Exception as read_error:
+                    print(f"读取错误 (重试 {retry_count + 1}): {read_error}")
+                    retry_count += 1
+                    time.sleep(0.1)
+            
+            if not response:
+                print("响应: [无响应或超时]")
+            else:
+                print(f"响应: {response}")
+            
             return response
+            
         except Exception as e:
             print(f"通信错误: {e}")
             return None
@@ -149,6 +193,42 @@ class OttoSerialController:
         """停止运动"""
         return self.send_command("STOP")
     
+    def debug_communication(self):
+        """调试通信状态"""
+        print("\n=== 通信调试信息 ===")
+        print(f"串口状态: {'打开' if self.serial.is_open else '关闭'}")
+        print(f"波特率: {self.serial.baudrate}")
+        print(f"超时设置: {self.serial.timeout}秒")
+        print(f"输入缓冲区字节数: {self.serial.in_waiting}")
+        print(f"DTR: {self.serial.dtr}, RTS: {self.serial.rts}")
+        
+        # 发送一个简单的测试命令
+        print("\n发送测试命令...")
+        self.send_command("GET_STATUS")
+        time.sleep(1)
+        
+    def test_basic_commands(self):
+        """测试基础命令"""
+        print("\n=== 基础命令测试 ===")
+        commands = [
+            "INIT",           # 已确认工作
+            "STOP",           # 简单命令
+            "WALK 1 1000 1 0", # 基础移动
+            "HOME 1",         # 回到初始位置
+            "GET_STATUS",     # 状态查询
+        ]
+        
+        for cmd in commands:
+            print(f"\n测试命令: {cmd}")
+            response = self.send_command(cmd)
+            if "OK:" in str(response):
+                print("✅ 命令执行成功")
+            elif "ERROR:" in str(response):
+                print("❌ 命令执行失败")
+            elif not response:
+                print("⚠️ 无响应（可能正在执行）")
+            time.sleep(2)  # 给Arduino更多时间处理
+            
     def close(self):
         """关闭串口连接"""
         if self.serial:
@@ -301,9 +381,11 @@ def main():
             print("2. 手部动作演示") 
             print("3. 高级动作演示")
             print("4. 交互模式")
-            print("5. 退出")
+            print("5. 通信调试")
+            print("6. 基础命令测试")
+            print("7. 退出")
             
-            choice = input("请选择 (1-5): ").strip()
+            choice = input("请选择 (1-7): ").strip()
             
             if choice == '1':
                 demo_basic_movements(otto)
@@ -314,6 +396,10 @@ def main():
             elif choice == '4':
                 interactive_mode(otto)
             elif choice == '5':
+                otto.debug_communication()
+            elif choice == '6':
+                otto.test_basic_commands()
+            elif choice == '7':
                 break
             else:
                 print("无效选择，请重试")
