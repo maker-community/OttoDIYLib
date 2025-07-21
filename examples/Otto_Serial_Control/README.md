@@ -18,9 +18,42 @@
 
 ## 硬件配置
 
-### Arduino Nano引脚分配
-```
-引脚    功能        说明
+### Arduino Nano 引脚连接
+
+#### 舵机连接 (优化PWM分配)
+| 舵机部位 | Arduino引脚 | 引脚类型 | 说明 |
+|----------|-------------|----------|------|
+| 左腿     | D3          | PWM      | 支持PWM，舵机控制最佳 |
+| 右腿     | D5          | PWM      | 支持PWM，舵机控制最佳 |
+| 左脚     | D6          | PWM      | 支持PWM，舵机控制最佳 |
+| 右脚     | D9          | PWM      | 支持PWM，舵机控制最佳 |
+| 左手     | D10         | PWM      | 支持PWM，舵机控制最佳 |
+| 右手     | D11         | PWM      | 支持PWM，舵机控制最佳 |
+
+#### 其他组件
+| 组件     | Arduino引脚 | 说明 |
+|----------|-------------|------|
+| 蜂鸣器   | D13         | 内置LED引脚，可共用 |
+| 状态LED  | D13         | 内置LED，状态指示 |
+| 串口通信 | D0(RX), D1(TX) | 硬件串口，与ESP32通信 |
+
+> 📖 **详细引脚指南**: 查看 [PINOUT_GUIDE.md](PINOUT_GUIDE.md) 获取完整的引脚布局和连接说明
+
+### 电源要求
+- **Arduino**: 通过USB或VIN供电 (7-12V)
+- **舵机**: 独立5V电源 (推荐5V/3-5A)
+- **重要**: 确保Arduino和舵机电源共地
+
+> 📋 **硬件连接指南**: 查看 [HARDWARE_GUIDE.md](HARDWARE_GUIDE.md) 获取完整的连接图和步骤说明
+
+## 文档索引
+
+| 文档 | 内容 |
+|------|------|
+| [README.md](README.md) | 主要说明文档 |
+| [PINOUT_GUIDE.md](PINOUT_GUIDE.md) | Arduino Nano 引脚对应详细指南 |
+| [HARDWARE_GUIDE.md](HARDWARE_GUIDE.md) | 硬件连接图和步骤说明 |
+| [CONNECTION_GUIDE.md](CONNECTION_GUIDE.md) | ESP32集成连接指南 |
 D2      左腿舵机    Left Leg Servo
 D3      右腿舵机    Right Leg Servo  
 D4      左脚舵机    Left Foot Servo

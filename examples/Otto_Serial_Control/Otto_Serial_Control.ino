@@ -3,6 +3,27 @@
 //-- 基于xiaozhi-esp32 otto-robot功能的Arduino Nano串口控制实现
 //-- 支持与ESP32通过串口通信控制Otto机器人的所有动作
 //-- 
+//-- 硬件要求:
+//-- * Arduino Nano (ATmega328P)
+//-- * 6个微型舵机 (SG90或类似)
+//-- * 蜂鸣器 (可选)
+//-- * 独立5V电源 (舵机用，推荐3-5A)
+//-- 
+//-- 引脚连接 (优化PWM分配):
+//-- * 左腿舵机  -> D3  (PWM支持)
+//-- * 右腿舵机  -> D5  (PWM支持)
+//-- * 左脚舵机  -> D6  (PWM支持)
+//-- * 右脚舵机  -> D9  (PWM支持)
+//-- * 左手舵机  -> D10 (PWM支持)
+//-- * 右手舵机  -> D11 (PWM支持)
+//-- * 蜂鸣器    -> D13 (内置LED可共用)
+//-- * 状态LED   -> D13 (内置LED)
+//-- * 串口通信  -> D0(RX), D1(TX) 硬件串口
+//-- 
+//-- 电源连接:
+//-- * Arduino: USB或VIN (7-12V)
+//-- * 舵机: 独立5V电源，与Arduino共地
+//-- 
 //-- 串口协议格式: COMMAND:param1,param2,param3,...\n
 //-- 波特率: 115200
 //-- 
@@ -41,15 +62,15 @@
 #include <SerialCommand.h>
 #include <Otto.h>
 
-// 引脚定义 - 兼容Arduino Nano
-#define LEFT_LEG_PIN    2   // 左腿舵机
-#define RIGHT_LEG_PIN   3   // 右腿舵机  
-#define LEFT_FOOT_PIN   4   // 左脚舵机
-#define RIGHT_FOOT_PIN  5   // 右脚舵机
-#define LEFT_HAND_PIN   6   // 左手舵机 (可选)
-#define RIGHT_HAND_PIN  7   // 右手舵机 (可选)
+// 引脚定义 - 兼容Arduino Nano (优化PWM分配)
+#define LEFT_LEG_PIN    3   // 左腿舵机 (PWM)
+#define RIGHT_LEG_PIN   5   // 右腿舵机 (PWM)  
+#define LEFT_FOOT_PIN   6   // 左脚舵机 (PWM)
+#define RIGHT_FOOT_PIN  9   // 右脚舵机 (PWM)
+#define LEFT_HAND_PIN   10  // 左手舵机 (PWM)
+#define RIGHT_HAND_PIN  11  // 右手舵机 (PWM)
 #define BUZZER_PIN      13  // 蜂鸣器
-#define STATUS_LED_PIN  LED_BUILTIN // 状态LED
+#define STATUS_LED_PIN  LED_BUILTIN // 状态LED (D13)
 
 // 舵机索引定义
 #define LEFT_LEG    0
