@@ -235,7 +235,7 @@ private:
         int amount = GetIntParam(args, "amount", 30);
         
         char command[128];
-        snprintf(command, sizeof(command), "WALK:%d,%d,1,%d", steps, speed, amount);
+        snprintf(command, sizeof(command), "WALK %d %d 1 %d", steps, speed, amount);
         
         if (SendCommand(command)) {
             return CreateSuccessResponse("Otto开始向前行走");
@@ -250,7 +250,7 @@ private:
         int amount = GetIntParam(args, "amount", 30);
         
         char command[128];
-        snprintf(command, sizeof(command), "WALK:%d,%d,-1,%d", steps, speed, amount);
+        snprintf(command, sizeof(command), "WALK %d %d -1 %d", steps, speed, amount);
         
         if (SendCommand(command)) {
             return CreateSuccessResponse("Otto开始向后行走");
@@ -264,7 +264,7 @@ private:
         int speed = GetIntParam(args, "speed", 2000);
         
         char command[128];
-        snprintf(command, sizeof(command), "TURN:%d,%d,1,0", steps, speed);
+        snprintf(command, sizeof(command), "TURN %d %d 1 0", steps, speed);
         
         if (SendCommand(command)) {
             return CreateSuccessResponse("Otto开始左转");
@@ -278,7 +278,7 @@ private:
         int speed = GetIntParam(args, "speed", 2000);
         
         char command[128];
-        snprintf(command, sizeof(command), "TURN:%d,%d,-1,0", steps, speed);
+        snprintf(command, sizeof(command), "TURN %d %d -1 0", steps, speed);
         
         if (SendCommand(command)) {
             return CreateSuccessResponse("Otto开始右转");
@@ -292,7 +292,7 @@ private:
         int speed = GetIntParam(args, "speed", 2000);
         
         char command[128];
-        snprintf(command, sizeof(command), "JUMP:%d,%d", steps, speed);
+        snprintf(command, sizeof(command), "JUMP %d %d", steps, speed);
         
         if (SendCommand(command)) {
             return CreateSuccessResponse("Otto开始跳跃");
@@ -307,7 +307,7 @@ private:
         int height = GetIntParam(args, "height", 20);
         
         char command[128];
-        snprintf(command, sizeof(command), "SWING:%d,%d,%d", steps, speed, height);
+        snprintf(command, sizeof(command), "SWING %d %d %d", steps, speed, height);
         
         if (SendCommand(command)) {
             return CreateSuccessResponse("Otto开始摇摆");
@@ -323,7 +323,7 @@ private:
         int direction = GetIntParam(args, "direction", 1);
         
         char command[128];
-        snprintf(command, sizeof(command), "MOONWALK:%d,%d,%d,%d", steps, speed, height, direction);
+        snprintf(command, sizeof(command), "MOONWALK %d %d %d %d", steps, speed, height, direction);
         
         if (SendCommand(command)) {
             return CreateSuccessResponse("Otto开始太空步");
@@ -337,7 +337,7 @@ private:
         int direction = GetIntParam(args, "direction", 0); // 0=双手
         
         char command[128];
-        snprintf(command, sizeof(command), "HANDS_UP:%d,%d", speed, direction);
+        snprintf(command, sizeof(command), "HANDS_UP %d %d", speed, direction);
         
         if (SendCommand(command)) {
             return CreateSuccessResponse("Otto举起手臂");
@@ -351,7 +351,7 @@ private:
         int direction = GetIntParam(args, "direction", 1); // 1=左手
         
         char command[128];
-        snprintf(command, sizeof(command), "HAND_WAVE:%d,%d", speed, direction);
+        snprintf(command, sizeof(command), "HAND_WAVE %d %d", speed, direction);
         
         if (SendCommand(command)) {
             return CreateSuccessResponse("Otto开始挥手");
@@ -364,7 +364,7 @@ private:
         bool hands_down = GetBoolParam(args, "hands_down", true);
         
         char command[128];
-        snprintf(command, sizeof(command), "HOME:%d", hands_down ? 1 : 0);
+        snprintf(command, sizeof(command), "HOME %d", hands_down ? 1 : 0);
         
         if (SendCommand(command)) {
             return CreateSuccessResponse("Otto回到初始位置");

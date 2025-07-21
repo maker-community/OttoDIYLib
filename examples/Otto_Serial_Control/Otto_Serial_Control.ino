@@ -24,33 +24,34 @@
 //-- * Arduino: USB或VIN (7-12V)
 //-- * 舵机: 独立5V电源，与Arduino共地
 //-- 
-//-- 串口协议格式: COMMAND:param1,param2,param3,...\n
+//-- 串口协议格式: COMMAND param1 param2 param3...\n
 //-- 波特率: 115200
+//-- 注意: 使用空格分隔命令和参数，不要使用冒号和逗号
 //-- 
 //-- 支持的命令:
 //-- INIT - 初始化机器人
-//-- HOME:hands_down - 回到初始位置 (hands_down: 0=保持手部位置, 1=放下手臂)
-//-- WALK:steps,speed,direction,amount - 行走 (direction: 1=前进, -1=后退; amount: 手臂摆动幅度)
-//-- TURN:steps,speed,direction,amount - 转向 (direction: 1=左转, -1=右转)
-//-- JUMP:steps,speed - 跳跃
-//-- SWING:steps,speed,height - 摇摆
-//-- MOONWALK:steps,speed,height,direction - 太空步
-//-- BEND:steps,speed,direction - 弯曲 (direction: 1=左, -1=右)
-//-- SHAKE_LEG:steps,speed,direction - 摇腿
-//-- UPDOWN:steps,speed,height - 上下运动
-//-- TIPTOE_SWING:steps,speed,height - 踮脚摇摆
-//-- JITTER:steps,speed,height - 抖动
-//-- ASCENDING_TURN:steps,speed,height - 上升转向
-//-- CRUSAITO:steps,speed,height,direction - 十字步
-//-- FLAPPING:steps,speed,height,direction - 拍打动作
-//-- HANDS_UP:speed,direction - 举手 (仅支持6舵机版本)
-//-- HANDS_DOWN:speed,direction - 放手
-//-- HAND_WAVE:speed,direction - 挥手 (direction: 1=左手, -1=右手, 0=双手)
-//-- SET_TRIMS:yl,yr,rl,rr,lh,rh - 设置舵机微调
-//-- ENABLE_LIMIT:speed_limit - 启用舵机速度限制 (degree/sec)
+//-- HOME hands_down - 回到初始位置 (hands_down: 0=保持手部位置, 1=放下手臂)
+//-- WALK steps speed direction amount - 行走 (direction: 1=前进, -1=后退; amount: 手臂摆动幅度)
+//-- TURN steps speed direction amount - 转向 (direction: 1=左转, -1=右转)
+//-- JUMP steps speed - 跳跃
+//-- SWING steps speed height - 摇摆
+//-- MOONWALK steps speed height direction - 太空步
+//-- BEND steps speed direction - 弯曲 (direction: 1=左, -1=右)
+//-- SHAKE_LEG steps speed direction - 摇腿
+//-- UPDOWN steps speed height - 上下运动
+//-- TIPTOE_SWING steps speed height - 踮脚摇摆
+//-- JITTER steps speed height - 抖动
+//-- ASCENDING_TURN steps speed height - 上升转向
+//-- CRUSAITO steps speed height direction - 十字步
+//-- FLAPPING steps speed height direction - 拍打动作
+//-- HANDS_UP speed direction - 举手 (仅支持6舵机版本)
+//-- HANDS_DOWN speed direction - 放手
+//-- HAND_WAVE speed direction - 挥手 (direction: 1=左手, -1=右手, 0=双手)
+//-- SET_TRIMS yl yr rl rr lh rh - 设置舵机微调
+//-- ENABLE_LIMIT speed_limit - 启用舵机速度限制 (degree/sec)
 //-- DISABLE_LIMIT - 禁用舵机速度限制
 //-- GET_STATUS - 获取机器人状态
-//-- SERVO_MOVE:servo,position - 单独控制舵机 (servo: 0-5, position: 0-180)
+//-- SERVO_MOVE servo position - 单独控制舵机 (servo: 0-5, position: 0-180)
 //-- STOP - 停止当前动作
 //-- 
 //-- 返回格式:

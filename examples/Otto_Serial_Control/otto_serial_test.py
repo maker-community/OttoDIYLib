@@ -10,12 +10,12 @@ Otto Serial Control Test Script
 
 命令格式示例:
 - INIT
-- HOME:1
-- WALK:2,1000,1,30
-- TURN:1,2000,-1,0
-- JUMP:1,2000
-- HANDS_UP:1000,0
-- HAND_WAVE:1000,1
+- HOME 1
+- WALK 2 1000 1 30
+- TURN 1 2000 -1 0
+- JUMP 1 2000
+- HANDS_UP 1000 0
+- HAND_WAVE 1000 1
 """
 
 import serial
@@ -59,79 +59,79 @@ class OttoSerialController:
     
     def home(self, hands_down=True):
         """回到初始位置"""
-        return self.send_command(f"HOME:{1 if hands_down else 0}")
+        return self.send_command(f"HOME {1 if hands_down else 0}")
     
     def walk(self, steps=2, speed=1000, direction=1, amount=30):
         """行走"""
-        return self.send_command(f"WALK:{steps},{speed},{direction},{amount}")
+        return self.send_command(f"WALK {steps} {speed} {direction} {amount}")
     
     def turn(self, steps=1, speed=2000, direction=1, amount=0):
         """转向"""
-        return self.send_command(f"TURN:{steps},{speed},{direction},{amount}")
+        return self.send_command(f"TURN {steps} {speed} {direction} {amount}")
     
     def jump(self, steps=1, speed=2000):
         """跳跃"""
-        return self.send_command(f"JUMP:{steps},{speed}")
+        return self.send_command(f"JUMP {steps} {speed}")
     
     def swing(self, steps=1, speed=1000, height=20):
         """摇摆"""
-        return self.send_command(f"SWING:{steps},{speed},{height}")
+        return self.send_command(f"SWING {steps} {speed} {height}")
     
     def moonwalk(self, steps=1, speed=900, height=20, direction=1):
         """太空步"""
-        return self.send_command(f"MOONWALK:{steps},{speed},{height},{direction}")
+        return self.send_command(f"MOONWALK {steps} {speed} {height} {direction}")
     
     def bend(self, steps=1, speed=1400, direction=1):
         """弯曲"""
-        return self.send_command(f"BEND:{steps},{speed},{direction}")
+        return self.send_command(f"BEND {steps} {speed} {direction}")
     
     def shake_leg(self, steps=1, speed=2000, direction=1):
         """摇腿"""
-        return self.send_command(f"SHAKE_LEG:{steps},{speed},{direction}")
+        return self.send_command(f"SHAKE_LEG {steps} {speed} {direction}")
     
     def up_down(self, steps=1, speed=1000, height=20):
         """上下运动"""
-        return self.send_command(f"UPDOWN:{steps},{speed},{height}")
+        return self.send_command(f"UPDOWN {steps} {speed} {height}")
     
     def tiptoe_swing(self, steps=1, speed=900, height=20):
         """踮脚摇摆"""
-        return self.send_command(f"TIPTOE_SWING:{steps},{speed},{height}")
+        return self.send_command(f"TIPTOE_SWING {steps} {speed} {height}")
     
     def jitter(self, steps=1, speed=500, height=20):
         """抖动"""
-        return self.send_command(f"JITTER:{steps},{speed},{height}")
+        return self.send_command(f"JITTER {steps} {speed} {height}")
     
     def ascending_turn(self, steps=1, speed=900, height=20):
         """上升转向"""
-        return self.send_command(f"ASCENDING_TURN:{steps},{speed},{height}")
+        return self.send_command(f"ASCENDING_TURN {steps} {speed} {height}")
     
     def crusaito(self, steps=1, speed=900, height=20, direction=1):
         """十字步"""
-        return self.send_command(f"CRUSAITO:{steps},{speed},{height},{direction}")
+        return self.send_command(f"CRUSAITO {steps} {speed} {height} {direction}")
     
     def flapping(self, steps=1, speed=1000, height=20, direction=1):
         """拍打动作"""
-        return self.send_command(f"FLAPPING:{steps},{speed},{height},{direction}")
+        return self.send_command(f"FLAPPING {steps} {speed} {height} {direction}")
     
     def hands_up(self, speed=1000, direction=0):
         """举手"""
-        return self.send_command(f"HANDS_UP:{speed},{direction}")
+        return self.send_command(f"HANDS_UP {speed} {direction}")
     
     def hands_down(self, speed=1000, direction=0):
         """放手"""
-        return self.send_command(f"HANDS_DOWN:{speed},{direction}")
+        return self.send_command(f"HANDS_DOWN {speed} {direction}")
     
     def hand_wave(self, speed=1000, direction=1):
         """挥手"""
-        return self.send_command(f"HAND_WAVE:{speed},{direction}")
+        return self.send_command(f"HAND_WAVE {speed} {direction}")
     
     def set_trims(self, yl=0, yr=0, rl=0, rr=0, lh=0, rh=0):
         """设置舵机微调"""
-        return self.send_command(f"SET_TRIMS:{yl},{yr},{rl},{rr},{lh},{rh}")
+        return self.send_command(f"SET_TRIMS {yl} {yr} {rl} {rr} {lh} {rh}")
     
     def enable_servo_limit(self, speed_limit=240):
         """启用舵机速度限制"""
-        return self.send_command(f"ENABLE_LIMIT:{speed_limit}")
+        return self.send_command(f"ENABLE_LIMIT {speed_limit}")
     
     def disable_servo_limit(self):
         """禁用舵机速度限制"""
@@ -143,7 +143,7 @@ class OttoSerialController:
     
     def move_servo(self, servo, position):
         """单独控制舵机"""
-        return self.send_command(f"SERVO_MOVE:{servo},{position}")
+        return self.send_command(f"SERVO_MOVE {servo} {position}")
     
     def stop(self):
         """停止运动"""
@@ -258,23 +258,23 @@ def print_help():
     help_text = """
 可用命令:
   INIT                    - 初始化机器人
-  HOME:hands_down         - 回到初始位置 (hands_down: 0或1)
-  WALK:steps,speed,dir,amount - 行走 (dir: 1=前进, -1=后退)
-  TURN:steps,speed,dir,amount - 转向 (dir: 1=左转, -1=右转)
-  JUMP:steps,speed        - 跳跃
-  SWING:steps,speed,height - 摇摆
-  MOONWALK:steps,speed,height,dir - 太空步
-  HANDS_UP:speed,dir      - 举手 (dir: 0=双手, 1=左手, -1=右手)
-  HANDS_DOWN:speed,dir    - 放手
-  HAND_WAVE:speed,dir     - 挥手
+  HOME hands_down         - 回到初始位置 (hands_down: 0或1)
+  WALK steps speed dir amount - 行走 (dir: 1=前进, -1=后退)
+  TURN steps speed dir amount - 转向 (dir: 1=左转, -1=右转)
+  JUMP steps speed        - 跳跃
+  SWING steps speed height - 摇摆
+  MOONWALK steps speed height dir - 太空步
+  HANDS_UP speed dir      - 举手 (dir: 0=双手, 1=左手, -1=右手)
+  HANDS_DOWN speed dir    - 放手
+  HAND_WAVE speed dir     - 挥手
   GET_STATUS              - 获取状态
   STOP                    - 停止运动
   
 示例:
-  WALK:2,1000,1,30       - 前进2步，速度1000，手臂摆动幅度30
-  TURN:1,2000,-1,0       - 右转1步，速度2000
-  HANDS_UP:1000,0        - 双手举起，速度1000
-  HAND_WAVE:1000,1       - 左手挥手，速度1000
+  WALK 2 1000 1 30       - 前进2步，速度1000，手臂摆动幅度30
+  TURN 1 2000 -1 0       - 右转1步，速度2000
+  HANDS_UP 1000 0        - 双手举起，速度1000
+  HAND_WAVE 1000 1       - 左手挥手，速度1000
 """
     print(help_text)
 

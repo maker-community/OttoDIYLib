@@ -13,7 +13,7 @@
 
 ### 📡 通信协议
 - **波特率**: 115200
-- **格式**: `COMMAND:param1,param2,param3,...\\n`
+- **格式**: `COMMAND param1 param2 param3...\\n`
 - **响应**: `OK:command` 或 `ERROR:message` 或 `STATUS:info`
 
 ## 硬件配置
@@ -107,7 +107,7 @@ INIT
 #### HOME
 回到初始位置
 ```
-HOME:hands_down
+HOME hands_down
 ```
 - `hands_down`: 0=保持手部位置, 1=放下手臂
 
@@ -128,7 +128,7 @@ STOP
 #### WALK
 行走动作
 ```
-WALK:steps,speed,direction,amount
+WALK steps speed direction amount
 ```
 - `steps`: 步数 (float)
 - `speed`: 速度/周期 (ms)
@@ -137,14 +137,14 @@ WALK:steps,speed,direction,amount
 
 示例:
 ```
-WALK:2,1000,1,30    # 前进2步，速度1000ms，手臂摆动幅度30
-WALK:1,1200,-1,0    # 后退1步，速度1200ms，不摆动手臂
+WALK 2 1000 1 30    # 前进2步，速度1000ms，手臂摆动幅度30
+WALK 1 1200 -1 0    # 后退1步，速度1200ms，不摆动手臂
 ```
 
 #### TURN
 转向动作
 ```
-TURN:steps,speed,direction,amount
+TURN steps speed direction amount
 ```
 - `steps`: 步数 (float)
 - `speed`: 速度/周期 (ms)  
@@ -153,22 +153,22 @@ TURN:steps,speed,direction,amount
 
 示例:
 ```
-TURN:1,2000,1,0     # 左转1步，速度2000ms
-TURN:2,1500,-1,20   # 右转2步，速度1500ms，手臂摆动
+TURN 1 2000 1 0     # 左转1步，速度2000ms
+TURN 2 1500 -1 20   # 右转2步，速度1500ms，手臂摆动
 ```
 
 #### JUMP
 跳跃动作
 ```
-JUMP:steps,speed
+JUMP steps speed
 ```
 - `steps`: 跳跃次数 (float)
 - `speed`: 速度/周期 (ms)
 
 示例:
 ```
-JUMP:1,2000         # 跳跃1次，速度2000ms
-JUMP:3,1500         # 连续跳跃3次
+JUMP 1 2000         # 跳跃1次，速度2000ms
+JUMP 3 1500         # 连续跳跃3次
 ```
 
 ### 特殊动作
@@ -176,7 +176,7 @@ JUMP:3,1500         # 连续跳跃3次
 #### SWING
 摇摆动作
 ```
-SWING:steps,speed,height
+SWING steps speed height
 ```
 - `steps`: 摇摆次数 (float)
 - `speed`: 速度/周期 (ms)
@@ -185,7 +185,7 @@ SWING:steps,speed,height
 #### MOONWALK
 太空步
 ```
-MOONWALK:steps,speed,height,direction
+MOONWALK steps speed height direction
 ```
 - `steps`: 步数 (float)
 - `speed`: 速度/周期 (ms)
@@ -195,7 +195,7 @@ MOONWALK:steps,speed,height,direction
 #### BEND
 弯曲动作
 ```
-BEND:steps,speed,direction
+BEND steps speed direction
 ```
 - `steps`: 弯曲次数 (float)
 - `speed`: 速度/周期 (ms)
@@ -222,7 +222,7 @@ UPDOWN:steps,speed,height
 #### TIPTOE_SWING
 踮脚摇摆
 ```
-TIPTOE_SWING:steps,speed,height
+TIPTOE_SWING steps speed height
 ```
 
 #### JITTER
@@ -234,7 +234,7 @@ JITTER:steps,speed,height
 #### ASCENDING_TURN
 上升转向
 ```
-ASCENDING_TURN:steps,speed,height
+ASCENDING_TURN steps speed height
 ```
 
 #### CRUSAITO
@@ -256,7 +256,7 @@ FLAPPING:steps,speed,height,direction
 #### HANDS_UP
 举手
 ```
-HANDS_UP:speed,direction
+HANDS_UP speed direction
 ```
 - `speed`: 动作速度 (ms)
 - `direction`: 方向 (0=双手, 1=左手, -1=右手)
@@ -264,13 +264,13 @@ HANDS_UP:speed,direction
 #### HANDS_DOWN
 放手
 ```
-HANDS_DOWN:speed,direction
+HANDS_DOWN speed direction
 ```
 
 #### HAND_WAVE
 挥手
 ```
-HAND_WAVE:speed,direction
+HAND_WAVE speed direction
 ```
 - `direction`: 方向 (1=左手, -1=右手, 0=双手)
 
@@ -279,7 +279,7 @@ HAND_WAVE:speed,direction
 #### SET_TRIMS
 设置舵机微调
 ```
-SET_TRIMS:yl,yr,rl,rr,lh,rh
+SET_TRIMS yl yr rl rr lh rh
 ```
 - `yl`: 左腿微调 (-90 to 90)
 - `yr`: 右腿微调
@@ -329,10 +329,10 @@ python otto_serial_test.py
 Otto> INIT
 响应: OK:INIT
 
-Otto> WALK:2,1000,1,30
+Otto> WALK 2 1000 1 30
 响应: OK:WALK
 
-Otto> HAND_WAVE:1000,1
+Otto> HAND_WAVE 1000 1
 响应: OK:HAND_WAVE
 
 Otto> GET_STATUS
@@ -346,7 +346,7 @@ Otto> GET_STATUS
 ```csharp
 SerialPort port = new SerialPort("COM3", 115200);
 port.Open();
-port.WriteLine("WALK:2,1000,1,30");
+port.WriteLine("WALK 2 1000 1 30");
 string response = port.ReadLine();
 ```
 
@@ -355,7 +355,7 @@ string response = port.ReadLine();
 const SerialPort = require('serialport');
 const port = new SerialPort('COM3', { baudRate: 115200 });
 
-port.write('WALK:2,1000,1,30\\n');
+port.write('WALK 2 1000 1 30\\n');
 port.on('data', (data) => {
     console.log('响应:', data.toString());
 });
@@ -412,7 +412,7 @@ SERVO_MOVE:1,90    # 测试右腿舵机
 
 #### 3. 回到安全位置
 ```
-HOME:1             # 强制回到初始位置
+HOME 1             # 强制回到初始位置
 ```
 
 ## 扩展开发
@@ -425,12 +425,12 @@ HOME:1             # 强制回到初始位置
 ```python
 # 自定义舞蹈动作
 commands = [
-    "HANDS_UP:1000,0",
-    "SWING:2,1000,30", 
-    "TURN:1,2000,1,0",
-    "JUMP:1,1500",
-    "HAND_WAVE:1000,0",
-    "HOME:1"
+    "HANDS_UP 1000 0",
+    "SWING 2 1000 30", 
+    "TURN 1 2000 1 0",
+    "JUMP 1 1500",
+    "HAND_WAVE 1000 0",
+    "HOME 1"
 ]
 
 for cmd in commands:
