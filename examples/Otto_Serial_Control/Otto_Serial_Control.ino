@@ -180,14 +180,29 @@ public:
     // 基础动作函数 - 直接使用Otto库
     void walk(float steps, int speed, int direction, int amount = 0) {
         if(is_resting) is_resting = false;
-        ottoRobot.walk(steps, speed, direction);
-        // Note: 原版Otto库不支持手臂摆动，这里可以扩展
+        
+        // 如果有手臂摆动需求且有手部舵机
+        if(amount > 0 && has_hands) {
+            // 实现简化的手臂摆动：在走路过程中让手臂轻微摆动
+            walkWithArmSwing(steps, speed, direction, amount);
+        } else {
+            ottoRobot.walk(steps, speed, direction);
+        }
+        
         Serial.println("OK:WALK");
     }
     
     void turn(float steps, int speed, int direction, int amount = 0) {
         if(is_resting) is_resting = false;
-        ottoRobot.turn(steps, speed, direction);
+        
+        // 如果有手臂摆动需求且有手部舵机
+        if(amount > 0 && has_hands) {
+            // 实现简化的转向手臂摆动
+            turnWithArmSwing(steps, speed, direction, amount);
+        } else {
+            ottoRobot.turn(steps, speed, direction);
+        }
+        
         Serial.println("OK:TURN");
     }
     
@@ -267,11 +282,12 @@ public:
         if(is_resting) is_resting = false;
         
         // direction: 0=双手, 1=左手, -1=右手
+        // 修正手臂角度：左手170度举起，右手10度举起（镜像关系）
         if(direction == 0 || direction == 1) {
-            moveServoToPosition(LEFT_HAND, 180, speed);
+            moveServoToPosition(LEFT_HAND, 170, speed);
         }
         if(direction == 0 || direction == -1) {
-            moveServoToPosition(RIGHT_HAND, 0, speed);
+            moveServoToPosition(RIGHT_HAND, 10, speed);
         }
         
         Serial.println("OK:HANDS_UP");
@@ -303,19 +319,28 @@ public:
         
         if(is_resting) is_resting = false;
         
-        // 挥手动作 - 简单的左右摆动
+        // 首先将要挥手的手臂举起
+        if(direction == LEFT || direction == 0) {
+            moveServoToPosition(LEFT_HAND, 170, speed/3);
+        }
+        if(direction == RIGHT || direction == 0) {
+            moveServoToPosition(RIGHT_HAND, 10, speed/3);
+        }
+        delay(speed/3);
+        
+        // 挥手动作 - 左右摆动
         for(int i = 0; i < 3; i++) {
             if(direction == LEFT || direction == 0) {
-                moveServoToPosition(LEFT_HAND, 120, speed/4);
-                delay(speed/4);
-                moveServoToPosition(LEFT_HAND, 60, speed/4);
-                delay(speed/4);
+                moveServoToPosition(LEFT_HAND, 140, speed/6);  // 向下30度
+                delay(speed/6);
+                moveServoToPosition(LEFT_HAND, 180, speed/6);  // 向上到最大角度
+                delay(speed/6);
             }
             if(direction == RIGHT || direction == 0) {
-                moveServoToPosition(RIGHT_HAND, 60, speed/4);
-                delay(speed/4);
-                moveServoToPosition(RIGHT_HAND, 120, speed/4);
-                delay(speed/4);
+                moveServoToPosition(RIGHT_HAND, 40, speed/6);   // 向上30度
+                delay(speed/6);
+                moveServoToPosition(RIGHT_HAND, 0, speed/6);    // 向下到最小角度
+                delay(speed/6);
             }
         }
         
@@ -389,6 +414,65 @@ private:
         if(duration > 0) {
             delay(duration);
         }
+    }
+    
+    // 带手臂摆动的走路功能
+    void walkWithArmSwing(float steps, int speed, int direction, int amount) {
+        // 计算每步的持续时间
+        int step_duration = speed / 2;  // 每步时间的一半用于手臂摆动
+        
+        // 计算手臂摆动的范围
+        int swing_range = constrain(amount, 10, 60);  // 限制摆动幅度
+        int left_center = HAND_HOME_POSITION;
+        int right_center = 180 - HAND_HOME_POSITION;
+        
+        for(int step = 0; step < steps; step++) {
+            // 模拟走路的手臂摆动：左手与右腿同步，右手与左腿同步
+            if(step % 2 == 0) {  // 偶数步
+                // 左手前摆，右手后摆
+                moveServoToPosition(LEFT_HAND, left_center - swing_range/2, step_duration/4);
+                moveServoToPosition(RIGHT_HAND, right_center + swing_range/2, step_duration/4);
+            } else {  // 奇数步
+                // 左手后摆，右手前摆
+                moveServoToPosition(LEFT_HAND, left_center + swing_range/2, step_duration/4);
+                moveServoToPosition(RIGHT_HAND, right_center - swing_range/2, step_duration/4);
+            }
+            
+            // 执行一步基础走路动作
+            ottoRobot.walk(1, speed, direction);
+        }
+        
+        // 恢复手臂到默认位置
+        moveServoToPosition(LEFT_HAND, left_center, 300);
+        moveServoToPosition(RIGHT_HAND, right_center, 300);
+    }
+    
+    // 带手臂摆动的转向功能
+    void turnWithArmSwing(float steps, int speed, int direction, int amount) {
+        // 计算手臂摆动的范围
+        int swing_range = constrain(amount, 10, 60);
+        int left_center = HAND_HOME_POSITION;
+        int right_center = 180 - HAND_HOME_POSITION;
+        
+        for(int step = 0; step < steps; step++) {
+            // 转向时的手臂摆动：增强转向效果
+            if(direction == LEFT) {  // 左转
+                // 左手向后，右手向前，增强左转效果
+                moveServoToPosition(LEFT_HAND, left_center + swing_range/2, speed/6);
+                moveServoToPosition(RIGHT_HAND, right_center - swing_range/2, speed/6);
+            } else {  // 右转
+                // 左手向前，右手向后，增强右转效果
+                moveServoToPosition(LEFT_HAND, left_center - swing_range/2, speed/6);
+                moveServoToPosition(RIGHT_HAND, right_center + swing_range/2, speed/6);
+            }
+            
+            // 执行一步转向动作
+            ottoRobot.turn(1, speed, direction);
+        }
+        
+        // 恢复手臂到默认位置
+        moveServoToPosition(LEFT_HAND, left_center, 300);
+        moveServoToPosition(RIGHT_HAND, right_center, 300);
     }
 };
 
