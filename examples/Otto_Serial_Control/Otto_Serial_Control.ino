@@ -62,6 +62,7 @@
 
 #include <SerialCommand.h>
 #include <Otto.h>
+#include <Servo.h>
 
 // 引脚定义 - 兼容Arduino Nano (优化PWM分配)
 #define LEFT_LEG_PIN    3   // 左腿舵机 (PWM)
@@ -101,6 +102,7 @@ private:
     int servo_trims[SERVO_COUNT];
     bool has_hands;
     bool is_resting;
+    Servo hand_servos[2]; // 手臂舵机对象
     
 public:
     ExtendedOtto() {
@@ -125,10 +127,15 @@ public:
         // 使用Otto库初始化基础4个舵机
         ottoRobot.init(LEFT_LEG_PIN, RIGHT_LEG_PIN, LEFT_FOOT_PIN, RIGHT_FOOT_PIN, true, BUZZER_PIN);
         
-        // 单独初始化手部舵机
+        // 初始化手部舵机
         if(has_hands) {
-            pinMode(LEFT_HAND_PIN, OUTPUT);
-            pinMode(RIGHT_HAND_PIN, OUTPUT);
+            hand_servos[0].attach(LEFT_HAND_PIN);   // 左手舵机
+            hand_servos[1].attach(RIGHT_HAND_PIN);  // 右手舵机
+            
+            // 设置手部舵机到默认位置
+            hand_servos[0].write(HAND_HOME_POSITION);
+            hand_servos[1].write(180 - HAND_HOME_POSITION);
+            delay(500);
         }
         
         is_resting = false;
@@ -354,15 +361,34 @@ public:
         Serial.println("OK:STOP");
     }
     
+    void detachServos() {
+        // 分离手臂舵机
+        if(has_hands) {
+            if(hand_servos[0].attached()) hand_servos[0].detach();
+            if(hand_servos[1].attached()) hand_servos[1].detach();
+        }
+        
+        // 分离Otto库管理的舵机
+        ottoRobot.detachServos();
+    }
+    
 private:
     void moveServoToPosition(int servo_index, int position, int duration = 200) {
-        // 简化的舵机控制 - 在实际实现中需要使用Servo库
-        // 这里只是示例，实际需要根据具体硬件实现
-        position += servo_trims[servo_index]; // 应用微调
+        // 应用微调
+        position += servo_trims[servo_index];
         position = constrain(position, 0, 180);
         
-        // TODO: 实现平滑的舵机运动
-        // 可以使用Servo库或者直接PWM控制
+        // 对于手臂舵机，使用Servo库控制
+        if(servo_index == LEFT_HAND && hand_servos[0].attached()) {
+            hand_servos[0].write(position);
+        } else if(servo_index == RIGHT_HAND && hand_servos[1].attached()) {
+            hand_servos[1].write(position);
+        }
+        
+        // 添加延时以实现平滑运动
+        if(duration > 0) {
+            delay(duration);
+        }
     }
 };
 
